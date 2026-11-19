@@ -203,7 +203,6 @@ const TACTICAL_CLUES_BY_POSITION: Record<string, string[]> = {
   ],
 };
 
-// Gerador pseudo-aleatório determinístico (seed fixo) para garantir estabilidade e 0 delay
 function createPRNG(seed: number) {
   let s = seed % 2147483647;
   if (s <= 0) s += 2147483646;
@@ -224,7 +223,7 @@ export function getAllPlayers(): PlayerCard[] {
   const existingNames = new Set(CURATED_PLAYERS.map((p) => p.name.toLowerCase()));
   const rand = createPRNG(421337);
 
-  const TARGET_COUNT = 10050; // Supera com segurança os 10.000 jogadores solicitados!
+  const TARGET_COUNT = 10050;
   let counter = 1;
 
   while (pool.length < TARGET_COUNT) {
@@ -233,7 +232,6 @@ export function getAllPlayers(): PlayerCard[] {
     const lastName = nation.lastNames[Math.floor(rand() * nation.lastNames.length)];
     const fullName = `${firstName} ${lastName}`;
 
-    // Garantir nome único
     if (existingNames.has(fullName.toLowerCase())) {
       counter++;
       continue;
@@ -252,15 +250,13 @@ export function getAllPlayers(): PlayerCard[] {
     }
 
     const difficultyRoll = rand();
-    const difficulty: GameDifficulty =
+    const difficulty: 'facil' | 'medio' | 'dificil' =
       difficultyRoll < 0.45 ? 'facil' : difficultyRoll < 0.8 ? 'medio' : 'dificil';
 
     const categories: GameCategory[] = [...nation.categories];
-    // Alguns jogadores aleatórios de nações campeãs entram em campeões de copa
     if ((nation.nationality === 'Brasil' || nation.nationality === 'França' || nation.nationality === 'Alemanha' || nation.nationality === 'Argentina' || nation.nationality === 'Itália') && rand() > 0.6) {
       categories.push('campeoes_copa');
     }
-    // Destaques mundiais entram em bola de ouro de tempos em tempos
     if (difficulty === 'facil' && rand() > 0.85) {
       categories.push('bola_de_ouro');
     }
@@ -278,11 +274,11 @@ export function getAllPlayers(): PlayerCard[] {
       nationality: nation.nationality,
       flag: nation.flag,
       position,
-      difficulty: difficulty === 'misto' ? 'medio' : difficulty,
+      difficulty,
       categories,
       clubs: [club1, club2],
       clue,
-      statsHighlight: `Transfermarkt: ${apps} partidas profissionais | ${goals > 0 ? `${goals} gols registrados | ` : ''}SofaScore nota ${ (6.8 + rand() * 0.7).toFixed(1) }`,
+      statsHighlight: `Transfermarkt: ${apps} partidas profissionais | ${goals > 0 ? `${goals} gols registrados | ` : ''}SofaScore nota ${(6.8 + rand() * 0.7).toFixed(1)}`,
       isPro: true,
     });
 
@@ -293,9 +289,6 @@ export function getAllPlayers(): PlayerCard[] {
   return cachedPlayerPool;
 }
 
-/**
- * Filtra a base respeitando categoria, dificuldade e histórico anti-repetição
- */
 export function getFilteredPlayers(
   category: GameCategory,
   difficulty: GameDifficulty,
@@ -305,19 +298,16 @@ export function getFilteredPlayers(
   const usedSet = new Set(usedPlayerIds);
 
   return all.filter((player) => {
-    // 1. Regra Estrita Anti-Repetição: nunca repetir jogadores já utilizados
     if (usedSet.has(player.id)) {
       return false;
     }
 
-    // 2. Filtro de Categoria
     if (category !== 'todos') {
       if (!player.categories.includes(category)) {
         return false;
       }
     }
 
-    // 3. Filtro de Dificuldade
     if (difficulty !== 'misto') {
       if (player.difficulty !== difficulty) {
         return false;
@@ -328,9 +318,6 @@ export function getFilteredPlayers(
   });
 }
 
-/**
- * Sorteia um jogador aleatório garantindo que não foi sorteado nesta sessão da sala
- */
 export function getRandomPlayer(
   category: GameCategory,
   difficulty: GameDifficulty,
@@ -339,7 +326,6 @@ export function getRandomPlayer(
   const eligible = getFilteredPlayers(category, difficulty, usedPlayerIds);
 
   if (eligible.length === 0) {
-    // Pool esgotado para o filtro selecionado
     return {
       player: null,
       remainingCount: 0,
