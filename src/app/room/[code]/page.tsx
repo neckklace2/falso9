@@ -53,6 +53,7 @@ export default function RoomPage() {
     }, 3500);
 
     const unsubscribe = RoomService.subscribeToRoom(roomCode, (data) => {
+      console.log('[Falso 9] Dados recebidos da sala:', data);
       clearTimeout(safetyTimer);
       setRoom(data);
       setLoading(false);
