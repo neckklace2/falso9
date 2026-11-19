@@ -110,10 +110,20 @@ export const RoomService = {
       usedPlayerIds: [],
     };
 
+    // Salva sempre no fallback local para garantir entrada instantânea
+    setLocalRoom(roomCode, newRoom);
+
     if (isFirebaseConfigured && db) {
-      await set(ref(db, `rooms/${roomCode}`), newRoom);
-    } else {
-      setLocalRoom(roomCode, newRoom);
+      try {
+        // Tenta gravar no Firebase com timeout de 2 segundos para não travar o usuário
+        const firebasePromise = set(ref(db, `rooms/${roomCode}`), newRoom);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Firebase timeout')), 2500)
+        );
+        await Promise.race([firebasePromise, timeoutPromise]);
+      } catch (err) {
+        console.warn('[Falso 9] Falha ao sincronizar com Firebase, usando local:', err);
+      }
     }
 
     return { roomCode, hostId };
@@ -137,22 +147,25 @@ export const RoomService = {
     };
 
     if (isFirebaseConfigured && db) {
-      const roomRef = ref(db, `rooms/${code}`);
-      const snapshot = await get(roomRef);
+      try {
+        const roomRef = ref(db, `rooms/${code}`);
+        const snapshot = await get(roomRef);
 
-      if (!snapshot.exists()) {
-        return { success: false, error: 'Sala não encontrada. Verifique o código.' };
+        if (snapshot.exists()) {
+          const roomData = snapshot.val() as RoomData;
+          if (roomData.round.status !== 'lobby') {
+            return { success: false, error: 'A partida desta sala já está em andamento.' };
+          }
+
+          await update(ref(db, `rooms/${code}/players/${playerId}`), newPlayer);
+          return { success: true, playerId };
+        }
+      } catch (err) {
+        console.warn('[Falso 9] Firebase join falhou, tentando fallback local:', err);
       }
+    }
 
-      const roomData = snapshot.val() as RoomData;
-      if (roomData.round.status !== 'lobby') {
-        return { success: false, error: 'A partida desta sala já está em andamento.' };
-      }
-
-      await update(ref(db, `rooms/${code}/players/${playerId}`), newPlayer);
-      return { success: true, playerId };
-    } else {
-      // Local Fallback
+    // Local Fallback
       const roomData = getLocalRoom(code);
       if (!roomData) {
         return { success: false, error: 'Sala não encontrada. Verifique o código digitado.' };
@@ -175,20 +188,29 @@ export const RoomService = {
   ): () => void {
     const code = roomCode.trim().toUpperCase();
 
+    // Sempre entrega o dado local imediatamente se existir para evitar qualquer tela de loading infinita!
+    const localData = getLocalRoom(code);
+    if (localData) {
+      onUpdate(localData);
+    }
+
     if (isFirebaseConfigured && db) {
       const roomRef = ref(db, `rooms/${code}`);
       const unsubscribe = onValue(
         roomRef,
         (snapshot) => {
           if (snapshot.exists()) {
-            onUpdate(snapshot.val() as RoomData);
-          } else {
+            const data = snapshot.val() as RoomData;
+            setLocalRoom(code, data);
+            onUpdate(data);
+          } else if (!localData) {
             onUpdate(null);
           }
         },
         (error) => {
           console.error('[Falso 9] Erro ao sincronizar sala:', error);
           if (onError) onError(error);
+          if (localData) onUpdate(localData);
         }
       );
       return () => unsubscribe();
