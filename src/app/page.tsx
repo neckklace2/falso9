@@ -21,7 +21,6 @@ function HomeContent() {
   const [errorMsg, setErrorMsg] = useState('');
   const [showHowToPlay, setShowHowToPlay] = useState(false);
 
-  // Se tiver ?room=CODE no link, foca na aba Entrar e preenche o código
   useEffect(() => {
     const codeFromUrl = searchParams.get('room');
     if (codeFromUrl) {
@@ -29,7 +28,6 @@ function HomeContent() {
       setActiveTab('join');
     }
 
-    // Carrega apelido salvo no dispositivo
     const savedNick = localStorage.getItem('impostor_fc_nickname');
     const savedAvatar = localStorage.getItem('impostor_fc_avatar');
     if (savedNick) setNickname(savedNick);
@@ -58,7 +56,6 @@ function HomeContent() {
 
     try {
       const { roomCode, hostId } = await RoomService.createRoom(nickname, selectedAvatar);
-      // Salva identidade do jogador na sessão
       sessionStorage.setItem(`impostor_player_${roomCode}`, hostId);
       router.push(`/room/${roomCode}`);
     } catch (err: unknown) {
@@ -117,18 +114,17 @@ function HomeContent() {
             Multiplayer em Tempo Real
           </div>
 
-          <h1 className="text-3xl font-black text-white tracking-tight leading-none">
-            IMPOSTOR <span className="text-turf-400">FC</span>
+          <h1 className="text-4xl font-black text-white tracking-tight leading-none">
+            FALSO <span className="text-turf-400">9</span>
           </h1>
 
           <p className="text-xs text-gray-400 max-w-xs mx-auto">
-            Cada amigo no seu próprio celular. Descubra quem é o perna de pau blefando sobre futebol!
+            Cada amigo no seu próprio celular. Descubra quem é o falso 9 blefando na rodada!
           </p>
         </div>
 
-        {/* Card Principal: Formulário */}
+        {/* Card Principal */}
         <div className="bg-pitch-850/90 border border-pitch-700/80 rounded-3xl p-5 shadow-2xl space-y-5">
-          {/* Apelido e Avatar */}
           <div className="space-y-2">
             <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block">
               Seu Apelido de Jogador
@@ -147,7 +143,6 @@ function HomeContent() {
               </div>
             </div>
 
-            {/* Seleção Rápida de Avatar */}
             <div className="flex items-center justify-between gap-1 pt-1 overflow-x-auto py-1">
               {AVATARS.map((avatar) => (
                 <button
@@ -169,7 +164,6 @@ function HomeContent() {
             </div>
           </div>
 
-          {/* Abas: Criar Sala vs Entrar na Sala */}
           <div className="flex rounded-2xl bg-pitch-900 p-1 border border-pitch-700/80">
             <button
               type="button"
@@ -205,21 +199,19 @@ function HomeContent() {
             </button>
           </div>
 
-          {/* Mensagem de Erro */}
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-red-500/15 border border-red-500/40 text-red-300 text-xs font-semibold text-center animate-fade-in">
+            <div className="p-3 rounded-xl bg-red-500/15 border border-red-500/40 text-red-300 text-xs font-semibold text-center">
               {errorMsg}
             </div>
           )}
 
-          {/* Formulário: Criar Sala */}
           {activeTab === 'create' ? (
             <form onSubmit={handleCreateRoom} className="space-y-4">
               <div className="bg-pitch-900/60 border border-pitch-800 rounded-2xl p-3 text-xs text-gray-300 space-y-1">
                 <span className="font-bold text-white block">
                   👑 Você será o Host:
                 </span>
-                Poderá escolher a modalidade, dificuldade, quantidade de impostores e apitar o início pelo seu celular.
+                Poderá escolher a modalidade, dificuldade, quantidade de Falsos 9 e apitar o início pelo seu celular.
               </div>
 
               <button
@@ -232,7 +224,6 @@ function HomeContent() {
               </button>
             </form>
           ) : (
-            /* Formulário: Entrar na Sala */
             <form onSubmit={handleJoinRoom} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block">
@@ -260,7 +251,7 @@ function HomeContent() {
           )}
         </div>
 
-        {/* Como Jogar Accordion */}
+        {/* Como Jogar */}
         <div className="bg-pitch-850/60 border border-pitch-700/60 rounded-2xl p-4">
           <button
             onClick={() => {
@@ -271,36 +262,36 @@ function HomeContent() {
           >
             <span className="flex items-center gap-2">
               <HelpCircle size={15} className="text-turf-400" />
-              Como Funciona a Partida?
+              Como Funciona o Falso 9?
             </span>
             <span className="text-gray-400">{showHowToPlay ? '▲' : '▼'}</span>
           </button>
 
           {showHowToPlay && (
-            <div className="mt-3 space-y-2 text-xs text-gray-300 border-t border-pitch-800 pt-3 animate-fade-in">
+            <div className="mt-3 space-y-2 text-xs text-gray-300 border-t border-pitch-800 pt-3">
               <div className="flex gap-2">
                 <span className="font-bold text-turf-400">1.</span>
                 <span>
-                  <strong>Cada um no seu celular:</strong> O Host cria a sala e envia o link/código no grupo do WhatsApp.
+                  <strong>Cada um no seu celular:</strong> O Host cria a sala e envia o link/código no WhatsApp.
                 </span>
               </div>
               <div className="flex gap-2">
                 <span className="font-bold text-turf-400">2.</span>
                 <span>
-                  <strong>Revelação secreta:</strong> Os jogadores da equipe veem o nome do jogador real sorteado. O Impostor vê apenas uma dica tática calibrada (dados Transfermarkt/SofaScore) para conseguir blefar.
+                  <strong>Revelação secreta:</strong> Os titulares veem o jogador real sorteado. O <strong>Falso 9</strong> vê apenas uma dica tática calibrada (Transfermarkt/SofaScore) para blefar.
                 </span>
               </div>
               <div className="flex gap-2">
                 <span className="font-bold text-turf-400">3.</span>
                 <span>
-                  <strong>Debate & Votação:</strong> Um cronômetro de 3 minutos é iniciado. Façam perguntas e descubram quem não sabe o jogador sorteado!
+                  <strong>Debate & Votação:</strong> Um cronômetro de 3 minutos é iniciado. Façam perguntas e descubram quem está fingindo saber!
                 </span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Rodapé com Destaques */}
+        {/* Rodapé */}
         <div className="flex items-center justify-center gap-4 text-[11px] text-gray-400 pt-1">
           <span className="flex items-center gap-1">
             <Trophy size={13} className="text-trophy-400" /> +10.000 Jogadores
@@ -321,7 +312,7 @@ function HomeContent() {
 
 export default function HomePage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-white">Carregando Impostor FC...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-white">Carregando Falso 9...</div>}>
       <HomeContent />
     </Suspense>
   );

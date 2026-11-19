@@ -26,7 +26,6 @@ export function ResultRevealView({
   const roles = room.round.roles || {};
   const players = room.players || {};
 
-  // Descobre quem eram os impostores
   const impostorPlayers = Object.entries(roles)
     .filter(([, role]) => role === 'impostor')
     .map(([playerId]) => players[playerId])
@@ -34,7 +33,6 @@ export function ResultRevealView({
 
   useEffect(() => {
     sounds.playRevealSuccess();
-
     try {
       confetti({
         particleCount: 80,
@@ -43,24 +41,23 @@ export function ResultRevealView({
         colors: ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'],
       });
     } catch {
-      // Ignora erro de confetti em ambientes headless
+      // Ignora
     }
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col p-4 pb-8 space-y-4 animate-fade-in">
-      {/* Cabeçalho do Resultado */}
+    <div className="flex-1 flex flex-col p-4 pb-8 space-y-4">
       <div className="text-center py-2">
-        <span className="text-3xl mb-1 inline-block animate-bounce">🏆</span>
+        <span className="text-3xl mb-1 inline-block">🏆</span>
         <h2 className="text-xl font-black text-white tracking-wide">
           Resultado da Rodada #{room.round.roundNumber || 1}
         </h2>
         <p className="text-xs text-gray-400">
-          Vejam quem era o impostor e confiram o atleta sorteado!
+          Vejam quem era o Falso 9 e confiram o atleta sorteado!
         </p>
       </div>
 
-      {/* Cartão do Jogador Sorteado */}
+      {/* Cartão do Jogador */}
       <div className="bg-gradient-to-b from-pitch-850 to-pitch-900 border-2 border-turf-500/70 rounded-3xl p-5 shadow-xl text-center space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-turf-500/20 text-turf-300 border border-turf-500/40 text-[10px] font-extrabold uppercase tracking-wider">
           <Trophy size={12} />
@@ -79,40 +76,28 @@ export function ResultRevealView({
           <span className="px-2.5 py-1 rounded-lg bg-pitch-800 border border-pitch-700 text-gray-200 font-semibold">
             {selectedPlayer?.position}
           </span>
-          <span className="px-2.5 py-1 rounded-lg bg-pitch-800 border border-pitch-700 text-gray-300 font-mono text-[11px]">
-            {selectedPlayer?.difficulty?.toUpperCase()}
-          </span>
         </div>
 
-        {/* Clubes Transfermarkt */}
         {selectedPlayer?.clubs && selectedPlayer.clubs.length > 0 && (
           <div className="text-xs text-gray-400 font-medium pt-1">
             Clubes: <span className="text-gray-200 font-semibold">{selectedPlayer.clubs.join(' • ')}</span>
           </div>
         )}
 
-        {/* Dica que foi entregue */}
         {selectedPlayer?.clue && room.settings.clueEnabled && (
           <div className="bg-pitch-950/80 border border-pitch-800 rounded-2xl p-3 text-left space-y-1">
             <span className="text-[10px] font-bold uppercase tracking-wider text-trophy-400 flex items-center gap-1">
               <Sparkles size={11} />
-              Dica Calibrada que o Impostor Recebeu
+              Dica que o Falso 9 Recebeu
             </span>
             <p className="text-xs text-gray-300 italic">
               &ldquo;{selectedPlayer.clue}&rdquo;
             </p>
           </div>
         )}
-
-        {/* Destaque SofaScore / Transfermarkt */}
-        {selectedPlayer?.statsHighlight && (
-          <div className="text-[10px] text-gray-400 font-mono">
-            {selectedPlayer.statsHighlight}
-          </div>
-        )}
       </div>
 
-      {/* Cartão dos Impostores */}
+      {/* Falsos 9 Revelados */}
       <div className="bg-gradient-to-b from-impostor-950/40 via-pitch-850 to-pitch-900 border-2 border-impostor-500/60 rounded-3xl p-5 shadow-xl space-y-3">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-impostor-500/20 text-impostor-400 flex items-center justify-center">
@@ -120,10 +105,10 @@ export function ResultRevealView({
           </div>
           <div>
             <div className="text-[10px] font-extrabold uppercase tracking-widest text-impostor-400">
-              Revelação dos Blefadores
+              Revelação
             </div>
             <h3 className="text-base font-black text-white">
-              Quem era o Impostor?
+              Quem era o Falso 9?
             </h3>
           </div>
         </div>
@@ -143,20 +128,20 @@ export function ResultRevealView({
                     {imp.name}
                   </div>
                   <div className="text-[10px] text-impostor-400 font-bold">
-                    O IMPOSTOR DA RODADA
+                    O FALSO 9 DA RODADA
                   </div>
                 </div>
               </div>
             ))
           ) : (
             <div className="text-xs text-gray-400 text-center py-2">
-              Nenhum impostor registrado nesta rodada.
+              Nenhum Falso 9 registrado nesta rodada.
             </div>
           )}
         </div>
       </div>
 
-      {/* Botões de Ação */}
+      {/* Botões */}
       {isHost ? (
         <div className="space-y-2 pt-2">
           <button
@@ -179,13 +164,13 @@ export function ResultRevealView({
               className="text-xs font-semibold text-gray-400 hover:text-white flex items-center gap-1.5 transition"
             >
               <History size={13} />
-              {showHistory ? 'Ocultar Histórico' : 'Ver Jogadores Anteriores'} ({room.usedPlayerIds?.length || 0})
+              {showHistory ? 'Ocultar' : 'Ver Anteriores'} ({room.usedPlayerIds?.length || 0})
             </button>
 
             <button
               onClick={() => {
                 sounds.playClick();
-                if (confirm('Deseja zerar o histórico de jogadores já sorteados para esta sala?')) {
+                if (confirm('Zerar o histórico de jogadores já sorteados?')) {
                   onResetUsedHistory();
                 }
               }}
@@ -201,12 +186,11 @@ export function ResultRevealView({
         </div>
       )}
 
-      {/* Lista de Histórico Anti-Repetição */}
       {showHistory && (
-        <div className="bg-pitch-900 border border-pitch-800 rounded-2xl p-3 space-y-2 text-xs animate-fade-in">
+        <div className="bg-pitch-900 border border-pitch-800 rounded-2xl p-3 space-y-2 text-xs">
           <div className="flex items-center gap-1.5 font-bold text-gray-300 pb-1 border-b border-pitch-800">
             <Shield size={12} className="text-turf-400" />
-            Atletas já jogados nesta sessão (sem repetições):
+            Atletas já jogados (sem repetições):
           </div>
           <div className="max-h-32 overflow-y-auto space-y-1 text-gray-400 font-mono text-[11px]">
             {room.usedPlayerIds && room.usedPlayerIds.length > 0 ? (
@@ -217,7 +201,7 @@ export function ResultRevealView({
                 </div>
               ))
             ) : (
-              <div>Nenhum jogador registrado no histórico ainda.</div>
+              <div>Nenhum jogador no histórico ainda.</div>
             )}
           </div>
         </div>

@@ -34,7 +34,6 @@ export function Header({ roomCode, roundNumber, onLeave }: HeaderProps) {
   return (
     <>
       <header className="sticky top-0 z-40 bg-pitch-950/90 backdrop-blur-md border-b border-pitch-800 px-4 py-3 flex items-center justify-between">
-        {/* Lado Esquerdo: Logo ou Voltar */}
         <div className="flex items-center gap-2">
           {onLeave ? (
             <button
@@ -52,7 +51,7 @@ export function Header({ roomCode, roundNumber, onLeave }: HeaderProps) {
             <div className="flex items-center gap-1.5">
               <span className="text-xl">⚽</span>
               <span className="font-black text-sm tracking-wide bg-gradient-to-r from-turf-400 via-white to-trophy-400 bg-clip-text text-transparent">
-                IMPOSTOR FC
+                FALSO 9
               </span>
             </div>
           )}
@@ -64,12 +63,10 @@ export function Header({ roomCode, roundNumber, onLeave }: HeaderProps) {
           )}
         </div>
 
-        {/* Centro / Código da Sala */}
         {roomCode && (
           <div className="flex items-center gap-1">
             <button
               onClick={copyCode}
-              title="Clique para copiar o código"
               className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-pitch-850 hover:bg-pitch-800 border border-pitch-700 text-xs font-mono font-bold text-white transition active:scale-95"
             >
               <span className="text-gray-400 text-[10px]">SALA</span>
@@ -82,7 +79,6 @@ export function Header({ roomCode, roundNumber, onLeave }: HeaderProps) {
                 sounds.playClick();
                 setShowQR(true);
               }}
-              title="Ver QR Code e link"
               className="p-1.5 rounded-xl bg-pitch-850 hover:bg-pitch-800 border border-pitch-700 text-gray-300 transition"
             >
               <QrCode size={14} />
@@ -90,11 +86,9 @@ export function Header({ roomCode, roundNumber, onLeave }: HeaderProps) {
           </div>
         )}
 
-        {/* Lado Direito: Som & Status */}
         <div className="flex items-center gap-1.5">
           {!isFirebaseConfigured && (
             <span
-              title="Modo Demonstração Local ativo. Adicione as chaves do Firebase em .env.local para sincronizar entre múltiplos celulares na internet."
               className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 hidden sm:inline-block"
             >
               Demo Local
@@ -104,7 +98,6 @@ export function Header({ roomCode, roundNumber, onLeave }: HeaderProps) {
           <button
             onClick={toggleSound}
             className="p-2 rounded-xl bg-pitch-850 hover:bg-pitch-800 border border-pitch-700 text-gray-300 transition"
-            title={muted ? 'Ativar sons' : 'Silenciar'}
           >
             {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
           </button>

@@ -2,12 +2,12 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Impostor FC Multiplayer | O Jogo da Galera',
-  description: 'Descubra quem é o impostor do futebol em tempo real com seus amigos! Cada um no seu celular.',
+  title: 'Falso 9 | O Jogo Multiplayer de Futebol',
+  description: 'Descubra quem é o Falso 9 em tempo real com seus amigos! Cada um no seu celular.',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Impostor FC',
+    title: 'Falso 9',
   },
 };
 

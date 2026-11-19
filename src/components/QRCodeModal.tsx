@@ -18,7 +18,7 @@ export function QRCodeModal({ roomCode, isOpen, onClose }: QRCodeModalProps) {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const inviteUrl = `${origin}/?room=${roomCode}`;
   const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-    `Bora jogar Impostor FC! Entra aí na sala *${roomCode}*: ${inviteUrl}`
+    `Bora jogar Falso 9! Entra aí na sala *${roomCode}*: ${inviteUrl}`
   )}`;
 
   const handleCopy = () => {
@@ -31,7 +31,7 @@ export function QRCodeModal({ roomCode, isOpen, onClose }: QRCodeModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="w-full max-w-xs bg-pitch-850 border border-pitch-700 rounded-3xl p-6 text-center shadow-2xl relative">
         <button
           onClick={() => {
@@ -49,7 +49,6 @@ export function QRCodeModal({ roomCode, isOpen, onClose }: QRCodeModalProps) {
           Compartilhe o código ou link com a galera:
         </p>
 
-        {/* Código Gigante */}
         <div className="bg-pitch-950 border border-turf-500/40 rounded-2xl py-3 px-4 mb-4">
           <div className="text-xs uppercase tracking-widest text-turf-400 font-semibold mb-1">
             Código da Sala
@@ -59,7 +58,6 @@ export function QRCodeModal({ roomCode, isOpen, onClose }: QRCodeModalProps) {
           </div>
         </div>
 
-        {/* QR Code gerado dinamicamente via Google Chart API rápida e limpa */}
         <div className="bg-white p-3 rounded-2xl mx-auto w-44 h-44 mb-4 flex items-center justify-center shadow-lg">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -71,7 +69,6 @@ export function QRCodeModal({ roomCode, isOpen, onClose }: QRCodeModalProps) {
           />
         </div>
 
-        {/* Botões de Ação */}
         <div className="space-y-2">
           <button
             onClick={handleCopy}

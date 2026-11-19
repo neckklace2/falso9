@@ -22,11 +22,11 @@ const CATEGORY_OPTIONS: { id: GameCategory; label: string; icon: string }[] = [
   { id: 'bola_de_ouro', label: 'Bola de Ouro', icon: '⭐' },
 ];
 
-const DIFFICULTY_OPTIONS: { id: GameDifficulty; label: string; badge: string }[] = [
-  { id: 'misto', label: 'Misto', badge: 'bg-purple-500/20 text-purple-300' },
-  { id: 'facil', label: 'Fácil', badge: 'bg-green-500/20 text-green-300' },
-  { id: 'medio', label: 'Médio', badge: 'bg-amber-500/20 text-amber-300' },
-  { id: 'dificil', label: 'Difícil', badge: 'bg-red-500/20 text-red-300' },
+const DIFFICULTY_OPTIONS: { id: GameDifficulty; label: string }[] = [
+  { id: 'misto', label: 'Misto' },
+  { id: 'facil', label: 'Fácil' },
+  { id: 'medio', label: 'Médio' },
+  { id: 'dificil', label: 'Difícil' },
 ];
 
 export function LobbyView({
@@ -42,7 +42,6 @@ export function LobbyView({
   const minPlayers = 3;
   const canStart = playerCount >= minPlayers;
 
-  // Calcula pool disponível em tempo real respeitando a regra estrita anti-repetição
   const availablePoolCount = useMemo(() => {
     const filtered = getFilteredPlayers(
       room.settings.category,
@@ -52,7 +51,6 @@ export function LobbyView({
     return filtered.length;
   }, [room.settings.category, room.settings.difficulty, room.usedPlayerIds]);
 
-  // Recomendação automática de impostores conforme número de participantes
   const recommendedImpostors = playerCount >= 7 ? 2 : 1;
 
   const handleCategoryChange = (category: GameCategory) => {
@@ -77,8 +75,8 @@ export function LobbyView({
   };
 
   return (
-    <div className="flex-1 flex flex-col p-4 pb-8 space-y-5 animate-fade-in">
-      {/* Banner de Boas-Vindas & Convite Rápido */}
+    <div className="flex-1 flex flex-col p-4 pb-8 space-y-5">
+      {/* Banner */}
       <div className="bg-gradient-to-r from-pitch-850 via-pitch-800 to-pitch-850 border border-pitch-700/80 rounded-2xl p-4 shadow-lg flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -91,7 +89,7 @@ export function LobbyView({
           </div>
           <p className="text-xs text-gray-400">
             {isHost
-              ? 'Configure a partida e convide a galera pelo link ou código.'
+              ? 'Configure a partida e convide a galera.'
               : 'Aguardando o Host iniciar a partida...'}
           </p>
         </div>
@@ -108,7 +106,7 @@ export function LobbyView({
         </button>
       </div>
 
-      {/* Lista de Jogadores Conectados */}
+      {/* Lista de Jogadores */}
       <div className="space-y-2">
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-400">
@@ -117,7 +115,7 @@ export function LobbyView({
           </div>
           {!canStart && (
             <span className="text-[10px] text-amber-400 font-semibold flex items-center gap-1">
-              <AlertCircle size={11} /> Mínimo de 3 para jogar
+              <AlertCircle size={11} /> Mínimo de 3
             </span>
           )}
         </div>
@@ -128,10 +126,11 @@ export function LobbyView({
             return (
               <div
                 key={player.id}
-                className={`flex items-center gap-2.5 p-3 rounded-2xl border transition ${isMe
+                className={`flex items-center gap-2.5 p-3 rounded-2xl border transition ${
+                  isMe
                     ? 'bg-pitch-800/90 border-turf-500/60 shadow-sm'
                     : 'bg-pitch-850/60 border-pitch-700/60'
-                  }`}
+                }`}
               >
                 <div className="w-9 h-9 rounded-xl bg-pitch-900 border border-pitch-700 flex items-center justify-center text-lg shrink-0">
                   {player.avatar || '⚽'}
@@ -142,7 +141,9 @@ export function LobbyView({
                       {player.name}
                     </span>
                     {player.isHost && (
-                      <Crown size={12} className="text-trophy-400 shrink-0" />
+                      <span className="shrink-0 flex items-center">
+                        <Crown size={12} className="text-trophy-400" />
+                      </span>
                     )}
                   </div>
                   <div className="text-[10px] text-gray-400">
@@ -155,9 +156,7 @@ export function LobbyView({
         </div>
       </div>
 
-      {/* ================================================================== */}
-      {/* PAINEL DO HOST (Apenas o Host vê e edita)                          */}
-      {/* ================================================================== */}
+      {/* PAINEL DO HOST */}
       {isHost ? (
         <div className="bg-pitch-850/90 border border-pitch-700 rounded-3xl p-4 space-y-4 shadow-xl">
           <div className="flex items-center justify-between pb-2 border-b border-pitch-700/60">
@@ -172,7 +171,7 @@ export function LobbyView({
             </div>
           </div>
 
-          {/* Modalidade / Categoria */}
+          {/* Categoria */}
           <div className="space-y-2">
             <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block">
               Modalidade / Categoria
@@ -184,10 +183,11 @@ export function LobbyView({
                   <button
                     key={cat.id}
                     onClick={() => handleCategoryChange(cat.id)}
-                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition border ${isSelected
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition border ${
+                      isSelected
                         ? 'bg-turf-500/15 border-turf-500 text-white font-bold'
                         : 'bg-pitch-800/40 border-pitch-700/60 text-gray-300 hover:bg-pitch-800'
-                      }`}
+                    }`}
                   >
                     <span className="flex items-center gap-2">
                       <span>{cat.icon}</span>
@@ -212,10 +212,11 @@ export function LobbyView({
                   <button
                     key={dif.id}
                     onClick={() => handleDifficultyChange(dif.id)}
-                    className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition border ${isSelected
+                    className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition border ${
+                      isSelected
                         ? 'bg-white text-pitch-950 border-white shadow-sm'
                         : 'bg-pitch-800/50 text-gray-300 border-pitch-700/60 hover:bg-pitch-800'
-                      }`}
+                    }`}
                   >
                     {dif.label}
                   </button>
@@ -224,13 +225,12 @@ export function LobbyView({
             </div>
           </div>
 
-          {/* Impostores & Dica Calibrada */}
+          {/* Falsos 9 & Dica */}
           <div className="grid grid-cols-2 gap-3 pt-1">
-            {/* Quantidade de Impostores */}
             <div className="bg-pitch-900/60 border border-pitch-700/60 rounded-2xl p-3">
               <div className="text-[10px] font-bold uppercase text-gray-400 mb-1 flex items-center gap-1">
                 <Flame size={12} className="text-impostor-400" />
-                Impostores
+                Falsos 9
               </div>
               <div className="flex items-center justify-between">
                 <button
@@ -256,18 +256,18 @@ export function LobbyView({
               </div>
             </div>
 
-            {/* Dica para o Impostor */}
             <div className="bg-pitch-900/60 border border-pitch-700/60 rounded-2xl p-3 flex flex-col justify-between">
               <div className="text-[10px] font-bold uppercase text-gray-400 mb-1 flex items-center gap-1">
                 <Shield size={12} className="text-trophy-400" />
-                Dica Impostor
+                Dica Falso 9
               </div>
               <button
                 onClick={handleClueToggle}
-                className={`py-2 px-2 rounded-xl text-xs font-bold transition border ${room.settings.clueEnabled
+                className={`py-2 px-2 rounded-xl text-xs font-bold transition border ${
+                  room.settings.clueEnabled
                     ? 'bg-turf-500/20 text-turf-300 border-turf-500/50'
                     : 'bg-red-500/20 text-red-300 border-red-500/50'
-                  }`}
+                }`}
               >
                 {room.settings.clueEnabled ? 'Ativada 💡' : 'Desativada ❌'}
               </button>
@@ -278,11 +278,8 @@ export function LobbyView({
           </div>
         </div>
       ) : (
-        /* ================================================================== */
-        /* VISÃO DOS DEMAIS JOGADORES (Apenas visualizam a configuração)      */
-        /* ================================================================== */
         <div className="bg-pitch-850/80 border border-pitch-700 rounded-3xl p-5 text-center space-y-4">
-          <div className="w-14 h-14 mx-auto rounded-full bg-turf-500/10 border border-turf-500/30 flex items-center justify-center text-2xl animate-bounce-slight">
+          <div className="w-14 h-14 mx-auto rounded-full bg-turf-500/10 border border-turf-500/30 flex items-center justify-center text-2xl">
             ⚽
           </div>
           <div>
@@ -290,11 +287,10 @@ export function LobbyView({
               Aguardando o Host apitar o início
             </h4>
             <p className="text-xs text-gray-400 max-w-xs mx-auto">
-              Fique de olho na tela! Assim que o Host clicar em Iniciar, teremos uma contagem regressiva sincronizada.
+              Fique de olho na tela! Assim que o Host clicar em Iniciar, a contagem começa.
             </p>
           </div>
 
-          {/* Resumo das configurações atuais */}
           <div className="bg-pitch-900/80 border border-pitch-700/60 rounded-2xl p-3 text-left space-y-1.5 text-xs">
             <div className="flex justify-between text-gray-400">
               <span>Tema:</span>
@@ -309,7 +305,7 @@ export function LobbyView({
               </span>
             </div>
             <div className="flex justify-between text-gray-400">
-              <span>Dica Impostor:</span>
+              <span>Dica Falso 9:</span>
               <span className="font-bold text-turf-400">
                 {room.settings.clueEnabled ? 'Ativada' : 'Desativada'}
               </span>
@@ -318,15 +314,15 @@ export function LobbyView({
         </div>
       )}
 
-      {/* Regra Anti-Repetição Badge */}
+      {/* Badge Anti-Repetição */}
       <div className="text-center px-4">
         <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 bg-pitch-850/50 border border-pitch-800 rounded-full py-1 px-3">
           <Shield size={11} className="text-turf-400" />
-          Anti-Repetição Ativo: nenhum atleta se repete nesta sessão ({room.usedPlayerIds?.length || 0} já jogados)
+          Anti-Repetição: nenhum atleta se repete ({room.usedPlayerIds?.length || 0} já jogados)
         </span>
       </div>
 
-      {/* Botão de Iniciar Partida (Exclusivo do Host) */}
+      {/* Botão Iniciar */}
       {isHost && (
         <div className="pt-2">
           <button
@@ -335,10 +331,11 @@ export function LobbyView({
               onStartGame();
             }}
             disabled={!canStart || availablePoolCount === 0}
-            className={`w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl transition-all active:scale-95 ${canStart && availablePoolCount > 0
+            className={`w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl transition-all active:scale-95 ${
+              canStart && availablePoolCount > 0
                 ? 'bg-gradient-to-r from-turf-500 via-turf-400 to-emerald-400 hover:from-turf-400 hover:to-emerald-300 text-pitch-950 shadow-turf-500/20'
                 : 'bg-pitch-800 text-gray-500 border border-pitch-700 cursor-not-allowed'
-              }`}
+            }`}
           >
             <Play size={18} fill="currentColor" />
             {canStart
