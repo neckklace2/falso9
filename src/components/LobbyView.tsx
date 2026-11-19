@@ -128,11 +128,10 @@ export function LobbyView({
             return (
               <div
                 key={player.id}
-                className={`flex items-center gap-2.5 p-3 rounded-2xl border transition ${
-                  isMe
+                className={`flex items-center gap-2.5 p-3 rounded-2xl border transition ${isMe
                     ? 'bg-pitch-800/90 border-turf-500/60 shadow-sm'
                     : 'bg-pitch-850/60 border-pitch-700/60'
-                }`}
+                  }`}
               >
                 <div className="w-9 h-9 rounded-xl bg-pitch-900 border border-pitch-700 flex items-center justify-center text-lg shrink-0">
                   {player.avatar || '⚽'}
@@ -143,7 +142,7 @@ export function LobbyView({
                       {player.name}
                     </span>
                     {player.isHost && (
-                      <Crown size={12} className="text-trophy-400 shrink-0" title="Host da Sala" />
+                      <Crown size={12} className="text-trophy-400 shrink-0" />
                     )}
                   </div>
                   <div className="text-[10px] text-gray-400">
@@ -185,11 +184,10 @@ export function LobbyView({
                   <button
                     key={cat.id}
                     onClick={() => handleCategoryChange(cat.id)}
-                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition border ${
-                      isSelected
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition border ${isSelected
                         ? 'bg-turf-500/15 border-turf-500 text-white font-bold'
                         : 'bg-pitch-800/40 border-pitch-700/60 text-gray-300 hover:bg-pitch-800'
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center gap-2">
                       <span>{cat.icon}</span>
@@ -214,11 +212,10 @@ export function LobbyView({
                   <button
                     key={dif.id}
                     onClick={() => handleDifficultyChange(dif.id)}
-                    className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition border ${
-                      isSelected
+                    className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition border ${isSelected
                         ? 'bg-white text-pitch-950 border-white shadow-sm'
                         : 'bg-pitch-800/50 text-gray-300 border-pitch-700/60 hover:bg-pitch-800'
-                    }`}
+                      }`}
                   >
                     {dif.label}
                   </button>
@@ -267,11 +264,10 @@ export function LobbyView({
               </div>
               <button
                 onClick={handleClueToggle}
-                className={`py-2 px-2 rounded-xl text-xs font-bold transition border ${
-                  room.settings.clueEnabled
+                className={`py-2 px-2 rounded-xl text-xs font-bold transition border ${room.settings.clueEnabled
                     ? 'bg-turf-500/20 text-turf-300 border-turf-500/50'
                     : 'bg-red-500/20 text-red-300 border-red-500/50'
-                }`}
+                  }`}
               >
                 {room.settings.clueEnabled ? 'Ativada 💡' : 'Desativada ❌'}
               </button>
@@ -339,11 +335,10 @@ export function LobbyView({
               onStartGame();
             }}
             disabled={!canStart || availablePoolCount === 0}
-            className={`w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl transition-all active:scale-95 ${
-              canStart && availablePoolCount > 0
+            className={`w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl transition-all active:scale-95 ${canStart && availablePoolCount > 0
                 ? 'bg-gradient-to-r from-turf-500 via-turf-400 to-emerald-400 hover:from-turf-400 hover:to-emerald-300 text-pitch-950 shadow-turf-500/20'
                 : 'bg-pitch-800 text-gray-500 border border-pitch-700 cursor-not-allowed'
-            }`}
+              }`}
           >
             <Play size={18} fill="currentColor" />
             {canStart
