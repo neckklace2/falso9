@@ -63,7 +63,35 @@ function notifyLocalSubscribers(roomCode: string, data: RoomData | null) {
 // SERVIÇO PRINCIPAL DE SALAS (FIREBASE COM FALLBACK AUTOMÁTICO)
 // ============================================================================
 
+const RTDB_URL = 'https://falso-9-27aae-default-rtdb.firebaseio.com';
+const REST_TIMEOUT_MS = 4000;
+
+// A API REST não depende de WebSocket, então funciona mesmo quando a rede bloqueia conexões em tempo real.
+// O tempo limite evita que a interface fique presa para sempre em "Conectando".
+async function restRequest(path: string, init?: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REST_TIMEOUT_MS);
+  try {
+    return await fetch(`${RTDB_URL}/${path}.json`, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export const RoomService = {
+  // Buscar a sala uma vez via REST (usado como caminho principal ao abrir o link da sala)
+  async fetchRoomSnapshot(roomCode: string): Promise<RoomData | null> {
+    const code = roomCode.trim().toUpperCase();
+    try {
+      const res = await restRequest(`rooms/${code}`);
+      if (!res.ok) return null;
+      return ((await res.json()) as RoomData | null) ?? null;
+    } catch (err) {
+      console.warn('[Falso 9] Falha ao buscar sala via REST:', err);
+      return null;
+    }
+  },
+
   // Criar uma nova sala
   async createRoom(
     hostName: string,
@@ -151,6 +179,26 @@ export const RoomService = {
       isHost: false,
       joinedAt: Date.now(),
     };
+
+    try {
+      const restRoom = await RoomService.fetchRoomSnapshot(code);
+      if (restRoom) {
+        if (restRoom.round.status !== 'lobby') {
+          return { success: false, error: 'A partida desta sala já está em andamento.' };
+        }
+
+        const res = await restRequest(`rooms/${code}/players/${playerId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newPlayer),
+        });
+        if (res.ok) {
+          return { success: true, playerId };
+        }
+      }
+    } catch (err) {
+      console.warn('[Falso 9] Entrada via REST falhou, tentando SDK:', err);
+    }
 
     if (isFirebaseConfigured && db) {
       try {

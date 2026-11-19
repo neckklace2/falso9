@@ -49,19 +49,8 @@ export default function RoomPage() {
 
     // Timeout de segurança: se o Firebase demorar mais de 1.5s, busca diretamente via REST API do Firebase
     const safetyTimer = setTimeout(async () => {
-      try {
-        const res = await fetch(`https://falso-9-27aae-default-rtdb.firebaseio.com/rooms/${roomCode}.json`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data) {
-            setRoom(data);
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (e) {
-        console.error('[Falso 9] REST fetch error:', e);
-      }
+      const data = await RoomService.fetchRoomSnapshot(roomCode);
+      if (data) setRoom(data);
       setLoading(false);
     }, 1500);
 
