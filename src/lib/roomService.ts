@@ -110,19 +110,25 @@ export const RoomService = {
       usedPlayerIds: [],
     };
 
-    // Salva sempre no fallback local para garantir entrada instantânea
+    // 1. Salva localmente
     setLocalRoom(roomCode, newRoom);
+
+    // 2. Grava no Firebase via REST (HTTP PUT) garantido contra bloqueios de WebSocket no navegador!
+    try {
+      await fetch(`https://falso-9-27aae-default-rtdb.firebaseio.com/rooms/${roomCode}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newRoom),
+      });
+    } catch (e) {
+      console.warn('[Falso 9] REST PUT room fallback:', e);
+    }
 
     if (isFirebaseConfigured && db) {
       try {
-        // Tenta gravar no Firebase com timeout de 2 segundos para não travar o usuário
-        const firebasePromise = set(ref(db, `rooms/${roomCode}`), newRoom);
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Firebase timeout')), 2500)
-        );
-        await Promise.race([firebasePromise, timeoutPromise]);
+        await set(ref(db, `rooms/${roomCode}`), newRoom);
       } catch (err) {
-        console.warn('[Falso 9] Falha ao sincronizar com Firebase, usando local:', err);
+        console.warn('[Falso 9] Firebase SDK set:', err);
       }
     }
 
