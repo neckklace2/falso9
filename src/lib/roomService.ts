@@ -188,14 +188,28 @@ export const RoomService = {
   ): () => void {
     const code = roomCode.trim().toUpperCase();
 
-    // Sempre entrega o dado local imediatamente se existir para evitar qualquer tela de loading infinita!
+    // 1. Tenta obter localmente primeiro para resposta imediata
     const localData = getLocalRoom(code);
     if (localData) {
       onUpdate(localData);
     }
 
+    // 2. Busca ativa via get() para não depender exclusivamente do websocket do onValue se a rede oscilar
     if (isFirebaseConfigured && db) {
       const roomRef = ref(db, `rooms/${code}`);
+
+      get(roomRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.val() as RoomData;
+            setLocalRoom(code, data);
+            onUpdate(data);
+          }
+        })
+        .catch((err) => {
+          console.warn('[Falso 9] Falha no get inicial da sala:', err);
+        });
+
       const unsubscribe = onValue(
         roomRef,
         (snapshot) => {
