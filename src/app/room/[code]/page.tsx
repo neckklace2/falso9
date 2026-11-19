@@ -26,12 +26,10 @@ export default function RoomPage() {
   const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
 
-  // Estados para caso o jogador entre direto pelo link sem ter preenchido apelido na home
   const [nicknameInput, setNicknameInput] = useState('');
   const [avatarInput, setAvatarInput] = useState('⚽');
   const [joinError, setJoinError] = useState('');
 
-  // 1. Carrega ou verifica o playerId salvo na sessão
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -46,21 +44,26 @@ export default function RoomPage() {
     if (savedAvatar) setAvatarInput(savedAvatar);
   }, [roomCode]);
 
-  // 2. Assina o estado da sala em tempo real
   useEffect(() => {
     if (!roomCode) return;
 
+    // Timeout de segurança: se o Firebase demorar mais de 3.5s, para o loading
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+    }, 3500);
+
     const unsubscribe = RoomService.subscribeToRoom(roomCode, (data) => {
+      clearTimeout(safetyTimer);
       setRoom(data);
       setLoading(false);
     });
 
     return () => {
+      clearTimeout(safetyTimer);
       unsubscribe();
     };
   }, [roomCode]);
 
-  // Ação de entrar na sala diretamente pelo link compartilhado
   const handleDirectJoin = async (e: React.FormEvent) => {
     e.preventDefault();
     setJoinError('');
@@ -88,7 +91,6 @@ export default function RoomPage() {
     }
   };
 
-  // Funções de controle do Host
   const handleUpdateSettings = useCallback(
     (settings: Partial<RoomSettings>) => {
       RoomService.updateSettings(roomCode, settings);
@@ -140,7 +142,6 @@ export default function RoomPage() {
     router.push('/');
   }, [roomCode, playerId, router]);
 
-  // Loading inicial
   if (loading) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-3">
@@ -152,7 +153,6 @@ export default function RoomPage() {
     );
   }
 
-  // Sala não encontrada
   if (!room) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4">
@@ -173,8 +173,7 @@ export default function RoomPage() {
     );
   }
 
-  // Se o jogador ainda não ingressou com seu apelido nesta sala (entrou direto via link)
-  const isPlayerRegistered = playerId && room.players[playerId];
+  const isPlayerRegistered = playerId && room.players && room.players[playerId];
 
   if (!isPlayerRegistered) {
     return (
@@ -209,7 +208,6 @@ export default function RoomPage() {
                 </div>
               </div>
 
-              {/* Seletor de Avatar */}
               <div className="flex items-center justify-between gap-1 pt-1 overflow-x-auto py-1">
                 {AVATARS.map((avatar) => (
                   <button
@@ -252,8 +250,6 @@ export default function RoomPage() {
 
   const isHost = room.hostId === playerId;
   const status = room.round.status;
-
-  // Papel individual deste aparelho
   const playerRole = (room.round.roles && room.round.roles[playerId]) || 'team';
 
   return (
@@ -264,7 +260,6 @@ export default function RoomPage() {
         onLeave={handleLeaveRoom}
       />
 
-      {/* ESTADO 1: LOBBY */}
       {status === 'lobby' && (
         <LobbyView
           room={room}
@@ -275,7 +270,6 @@ export default function RoomPage() {
         />
       )}
 
-      {/* ESTADO 2: CONTAGEM REGRESSIVA SINCRONIZADA (3... 2... 1...) */}
       {status === 'countdown' && (
         <CountdownView
           countdownStartAt={room.round.countdownStartAt}
@@ -284,17 +278,14 @@ export default function RoomPage() {
         />
       )}
 
-      {/* ESTADO 3: PARTIDA & DEBATE (Revelação Secreta por Aparelho) */}
       {status === 'playing' && (
         <div className="flex-1 flex flex-col p-4 pb-8 space-y-4 animate-fade-in">
-          {/* Cartão de Papel Secreto Individual */}
           <SecretRoleView
             role={playerRole}
             selectedPlayer={room.round.selectedPlayer}
             clueEnabled={room.settings.clueEnabled}
           />
 
-          {/* Cronômetro e Controle de Debate */}
           <DebateTimerView
             room={room}
             currentPlayerId={playerId}
@@ -305,7 +296,6 @@ export default function RoomPage() {
         </div>
       )}
 
-      {/* ESTADO 4: REVELAÇÃO DO RESULTADO */}
       {status === 'revealed' && (
         <ResultRevealView
           room={room}
@@ -315,7 +305,6 @@ export default function RoomPage() {
         />
       )}
 
-      {/* Modal de Compartilhamento / QR Code */}
       <QRCodeModal
         roomCode={roomCode}
         isOpen={showInviteModal}
