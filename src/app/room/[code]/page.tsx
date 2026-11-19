@@ -52,12 +52,19 @@ export default function RoomPage() {
       setLoading(false);
     }, 3500);
 
-    const unsubscribe = RoomService.subscribeToRoom(roomCode, (data) => {
-      console.log('[Falso 9] Dados recebidos da sala:', data);
-      clearTimeout(safetyTimer);
-      setRoom(data);
-      setLoading(false);
-    });
+    const unsubscribe = RoomService.subscribeToRoom(
+      roomCode,
+      (data) => {
+        clearTimeout(safetyTimer);
+        setRoom(data);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('[Falso 9] Erro subscription:', error);
+        clearTimeout(safetyTimer);
+        setLoading(false);
+      }
+    );
 
     return () => {
       clearTimeout(safetyTimer);

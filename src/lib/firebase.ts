@@ -19,7 +19,7 @@ let db: Database | null = null;
 if (typeof window !== 'undefined') {
   try {
     app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-    db = getDatabase(app);
+    db = getDatabase(app, firebaseConfig.databaseURL);
   } catch (error) {
     console.error('[Falso 9] Erro Firebase:', error);
   }

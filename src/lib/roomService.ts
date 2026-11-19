@@ -168,7 +168,11 @@ export const RoomService = {
   },
 
   // Escuta em tempo real atualizações da sala
-  subscribeToRoom(roomCode: string, onUpdate: (data: RoomData | null) => void): () => void {
+  subscribeToRoom(
+    roomCode: string,
+    onUpdate: (data: RoomData | null) => void,
+    onError?: (error: Error) => void
+  ): () => void {
     const code = roomCode.trim().toUpperCase();
 
     if (isFirebaseConfigured && db) {
@@ -183,7 +187,8 @@ export const RoomService = {
           }
         },
         (error) => {
-          console.error('[Impostor FC] Erro ao sincronizar sala:', error);
+          console.error('[Falso 9] Erro ao sincronizar sala:', error);
+          if (onError) onError(error);
         }
       );
       return () => unsubscribe();
