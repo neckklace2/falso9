@@ -172,18 +172,17 @@ export const RoomService = {
     }
 
     // Local Fallback
-      const roomData = getLocalRoom(code);
-      if (!roomData) {
-        return { success: false, error: 'Sala não encontrada. Verifique o código digitado.' };
-      }
-      if (roomData.round.status !== 'lobby') {
-        return { success: false, error: 'A partida desta sala já está em andamento.' };
-      }
-
-      roomData.players[playerId] = newPlayer;
-      setLocalRoom(code, roomData);
-      return { success: true, playerId };
+    const roomData = getLocalRoom(code);
+    if (!roomData) {
+      return { success: false, error: 'Sala não encontrada. Verifique o código digitado.' };
     }
+    if (roomData.round.status !== 'lobby') {
+      return { success: false, error: 'A partida desta sala já está em andamento.' };
+    }
+
+    roomData.players[playerId] = newPlayer;
+    setLocalRoom(code, roomData);
+    return { success: true, playerId };
   },
 
   // Escuta em tempo real atualizações da sala
